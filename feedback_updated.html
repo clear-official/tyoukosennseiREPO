@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>鑑定フィードバック資料</title>
+  <style>
+    :root{
+      --bg:#f6f0e5;
+      --paper:#fffdf8;
+      --ink:#352b26;
+      --muted:#786c63;
+      --red:#8d2f3d;
+      --red-dark:#6d1f2b;
+      --gold:#b7924b;
+      --line:#dacdb9;
+      --green:#536b58;
+      --shadow:0 14px 38px rgba(67,46,31,.13);
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{
+      margin:0;
+      min-height:100%;
+      font-family:"Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at 10% 15%, rgba(183,146,75,.08), transparent 26%),
+        radial-gradient(circle at 90% 85%, rgba(141,47,61,.07), transparent 28%),
+        repeating-linear-gradient(0deg, rgba(80,60,45,.018) 0, rgba(80,60,45,.018) 1px, transparent 1px, transparent 5px),
+        var(--bg);
+    }
+
+    body{overflow:auto}
+    button{font:inherit}
+
+    .page{
+      width:min(1120px, 100%);
+      min-height:100dvh;
+      margin:0 auto;
+      padding:18px;
+      display:grid;
+      grid-template-rows:auto auto 1fr;
+      gap:14px;
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:18px 22px;
+      background:rgba(255,253,248,.94);
+      box-shadow:var(--shadow);
+    }
+
+    .hero::before,
+    .hero::after{
+      content:"";
+      position:absolute;
+      width:130px;
+      height:130px;
+      border:1px solid rgba(183,146,75,.2);
+      border-radius:50%;
+    }
+
+    .hero::before{left:-45px;top:-72px}
+    .hero::after{right:-35px;bottom:-80px}
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      color:var(--red);
+      font-size:12px;
+      letter-spacing:.18em;
+      font-weight:700;
+    }
+
+    .eyebrow::before,.eyebrow::after{
+      content:"";
+      width:30px;
+      height:1px;
+      background:var(--gold);
+    }
+
+    h1{
+      margin:7px 0 5px;
+      font-size:clamp(23px,3vw,34px);
+      letter-spacing:.08em;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .tabs{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+
+    .tab{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,253,248,.82);
+      padding:12px 10px;
+      cursor:pointer;
+      color:var(--muted);
+      transition:.2s ease;
+      box-shadow:0 5px 15px rgba(67,46,31,.05);
+      font-weight:700;
+    }
+
+    .tab:hover{transform:translateY(-2px);border-color:var(--gold)}
+    .tab.active{
+      color:#fff;
+      border-color:var(--red);
+      background:linear-gradient(135deg,var(--red),var(--red-dark));
+      box-shadow:0 8px 22px rgba(141,47,61,.24);
+    }
+
+    .content-wrap{min-height:0;position:relative}
+
+    .panel{
+      display:none;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .panel.active{display:grid}
+
+    .card{
+      min-height:0;
+      overflow:auto;
+      scrollbar-width:thin;
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      background:
+        linear-gradient(rgba(255,253,248,.95),rgba(255,253,248,.95)),
+        repeating-linear-gradient(90deg, transparent 0, transparent 18px, rgba(183,146,75,.035) 19px);
+      box-shadow:var(--shadow);
+    }
+
+    .card-title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:13px;
+      color:var(--red-dark);
+      font-size:18px;
+      font-weight:800;
+    }
+
+    .seal{
+      width:34px;
+      height:34px;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(141,47,61,.35);
+      color:var(--red);
+      background:#fff8f4;
+      transform:rotate(-4deg);
+      font-size:15px;
+      flex:none;
+    }
+
+    .quote{
+      margin:0 0 13px;
+      padding:12px 14px;
+      border-left:3px solid var(--gold);
+      background:#f9f4ea;
+      font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+      font-size:13px;
+      line-height:1.75;
+      color:#4f443d;
+    }
+
+    .card p,.card li{
+      font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    .card p{margin:0 0 10px}
+    .card ul{margin:6px 0 0;padding-left:1.2em}
+
+    .growth-box{
+      border:1px solid rgba(183,146,75,.42);
+      border-radius:15px;
+      padding:14px;
+      background:linear-gradient(135deg,#fffaf0,#fbf5e8);
+    }
+
+    .growth-label{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      color:var(--gold);
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .growth-label::before{content:"✦"}
+
+    .advice-button{
+      width:100%;
+      margin-top:14px;
+      padding:13px 16px;
+      border:0;
+      border-radius:999px;
+      cursor:pointer;
+      color:#fff;
+      background:linear-gradient(135deg,var(--green),#384c3d);
+      box-shadow:0 8px 18px rgba(83,107,88,.22);
+      font-weight:800;
+      letter-spacing:.05em;
+      transition:.2s ease;
+    }
+
+    .advice-button:hover{transform:translateY(-2px)}
+
+    .summary{
+      grid-column:1/-1;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:13px 17px;
+      border:1px solid rgba(141,47,61,.2);
+      border-radius:18px;
+      background:linear-gradient(135deg,rgba(141,47,61,.08),rgba(183,146,75,.08));
+      font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+      font-size:13px;
+      line-height:1.7;
+    }
+
+    .summary strong{color:var(--red-dark);white-space:nowrap}
+
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      padding:18px;
+      background:rgba(34,25,21,.64);
+      backdrop-filter:blur(4px);
+      z-index:20;
+    }
+
+    .modal-backdrop.open{display:grid}
+
+    .modal{
+      position:relative;
+      width:min(720px,100%);
+      max-height:85dvh;
+      overflow:auto;
+      border:1px solid #d5c5ab;
+      border-radius:24px;
+      padding:34px 32px 30px;
+      background:
+        linear-gradient(rgba(255,253,248,.97),rgba(255,253,248,.97)),
+        repeating-linear-gradient(0deg,transparent 0,transparent 5px,rgba(80,60,45,.025) 6px);
+      box-shadow:0 25px 80px rgba(0,0,0,.3);
+      animation:pop .2s ease;
+    }
+
+    @keyframes pop{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;transform:none}}
+
+    .modal::before{
+      content:"";
+      position:absolute;
+      inset:12px;
+      border:1px solid rgba(183,146,75,.25);
+      border-radius:17px;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .modal > *{
+      position:relative;
+      z-index:1;
+    }
+
+    .modal h2{
+      position:relative;
+      z-index:1;
+      margin:0 42px 14px 0;
+      color:var(--red-dark);
+      font-size:23px;
+    }
+
+    .modal h3{
+      margin:18px 0 7px;
+      color:var(--green);
+      font-size:16px;
+    }
+
+    .modal p,.modal li{
+      font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+      font-size:14px;
+      line-height:1.85;
+    }
+
+    .modal ul,.modal ol{padding-left:1.3em}
+
+    .note{
+      margin:12px 0 0;
+      padding:12px 14px;
+      border-radius:12px;
+      background:#fffaf2;
+      border:1px solid rgba(183,146,75,.35);
+      color:#5f544b;
+    }
+
+    .example{
+      margin-top:10px;
+      padding:14px;
+      border-radius:14px;
+      background:#f8f1e7;
+      border-left:3px solid var(--red);
+      font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+      font-size:14px;
+      line-height:1.85;
+    }
+
+    .example-title{
+      display:block;
+      margin:8px 0 10px;
+      color:var(--red-dark);
+      font-weight:800;
+    }
+
+    .close{
+      position:absolute;
+      right:22px;
+      top:21px;
+      width:34px;
+      height:34px;
+      border:1px solid var(--line);
+      border-radius:50%;
+      background:#fff;
+      cursor:pointer;
+      color:var(--red-dark);
+      font-size:20px;
+      z-index:2;
+    }
+
+    @media(max-width:760px){
+      .page{padding:10px;grid-template-rows:auto auto auto}
+      .modal{padding:32px 24px 26px}
+      .modal::before{inset:9px}
+      .close{right:17px;top:16px}
+      .tabs{grid-template-columns:1fr}
+      .panel,.panel.active{grid-template-columns:1fr}
+      .card{overflow:visible}
+      .summary{grid-column:auto;align-items:flex-start;flex-direction:column;gap:4px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">鑑定品質向上のための振り返り</div>
+      <h1>鑑定フィードバック</h1>
+      <p>良いところを活かしながら、より信頼される鑑定へつなげるための改善ポイントをまとめています。</p>
+    </header>
+
+    <nav class="tabs" aria-label="フィードバック項目">
+      <button class="tab active" type="button" data-panel="hearing">初回ヒアリング</button>
+      <button class="tab" type="button" data-panel="reading">鑑定内容・誘導</button>
+      <button class="tab" type="button" data-panel="follow">アフターフォロー</button>
+    </nav>
+
+    <section class="content-wrap">
+      <div class="panel active" id="hearing">
+        <article class="card">
+          <div class="card-title"><span class="seal">良</span>良かった点</div>
+          <p>ご依頼内容を受け止め、早いテンポで鑑定へ入れている点は良い印象です。</p>
+          <p>お客様を長く待たせず、安心感につなげられている点は強みとして活かせます。</p>
+          <div class="quote">鑑定にお時間をいただく場合は、「○分ほどお時間を頂戴しますね」と一言添えることで、さらに安心してお待ちいただけます。</div>
+        </article>
+
+        <article class="card">
+          <div class="card-title"><span class="seal">伸</span>伸びしろポイント</div>
+          <div class="growth-box">
+            <div class="growth-label">状況を整理する質問が不足しています</div>
+            <p>カルテには一定の情報が記載されていますが、そのまま鑑定へ進むと、お客様が本当に知りたい内容とのずれが生まれる可能性があります。</p>
+            <p>例えば、</p>
+            <ul>
+              <li>現在、お相手とはどのような状況なのか（別れたばかり・連絡が取れている・音信不通など）</li>
+              <li>お客様が望んでいるのは「復縁」なのか、それとも「お相手の気持ちを知りたい」のか</li>
+              <li>お相手に現在交際相手や配偶者がいるのか、その状況を気にされているのか</li>
+            </ul>
+            <p>こうした点が曖昧なまま有料メッセージへ進むと、「自分の状況を理解してもらえていない」と感じられ、鑑定結果の価値や期待感が伝わりにくくなることがあります。</p>
+            <p>相談は、お客様ごとに状況が大きく異なります。だからこそ、最初に現在の関係性やお客様が一番知りたいことを丁寧に整理してから鑑定へ進むことで、「私のために視てくれている」という特別感や信頼感にも繋がります。</p>
+          </div>
+          <button class="advice-button" type="button" data-modal="modal-hearing">改善やアドバイスを見る ⇒</button>
+        </article>
+
+        <div class="summary"><strong>今回の要点</strong><span>ヒアリングは情報収集だけでなく、「自分を知ろうとしてくれている」と感じてもらうための信頼づくりでもあります。</span></div>
+      </div>
+
+      <div class="panel" id="reading">
+        <article class="card">
+          <div class="card-title"><span class="seal">良</span>良かった点</div>
+          <p>次の鑑定で得られる内容を、具体的に提示できている点はとても良いです。</p>
+          <div class="quote">「具体的に送信するメッセージの例文と、彼から返信が来やすくなる時間帯、そして絶対に送ってはいけないNGワードなど、引き続きお伝えしてもよろしいでしょうか？」</div>
+          <p>お客様の「実際にどう行動すればよいのか知りたい」というニーズを捉えた誘導になっています。</p>
+        </article>
+
+        <article class="card">
+          <div class="card-title"><span class="seal">伸</span>伸びしろポイント</div>
+          <div class="growth-box">
+            <div class="growth-label">共感が加わると、さらに魅力が伝わります</div>
+            <p>誘導や鑑定内容は具体的ですが、寄り添いよりも「業務的な鑑定」という印象が先に立ちやすくなっています。</p>
+            <p>結果を提示する前に、お客様の不安やこれまでの頑張りを受け止める言葉が入ると、鑑定を進める動機と信頼感が高まります。</p>
+          </div>
+          <button class="advice-button" type="button" data-modal="modal-reading">改善やアドバイスを見る ⇒</button>
+        </article>
+
+        <div class="summary"><strong>今回の要点</strong><span>「何が分かるか」だけでなく、「この先生なら気持ちも分かってくれる」と感じてもらうことが、開封や継続につながります。</span></div>
+      </div>
+
+      <div class="panel" id="follow">
+        <article class="card">
+          <div class="card-title"><span class="seal">良</span>良かった点</div>
+          <div class="quote">「いつでもお声掛けくださいね。復縁へのステップは大事の前の小事です。応援しておりますね✨️」</div>
+          <p>鑑定の終わりに、優しく背中を押す言葉を添えられている点は素晴らしいです。</p>
+          <p>全体的に端的でありながらも、最後はお客様に冷たい印象を残さず、相談しやすい空気を作れています。</p>
+        </article>
+
+        <article class="card">
+          <div class="card-title"><span class="seal">伸</span>伸びしろポイント</div>
+          <div class="growth-box">
+            <div class="growth-label">数日後の具体的な追いメッセージが重要です</div>
+            <p>「いつでもお声掛けください」で終わると、そのまま関係が途切れやすくなります。</p>
+            <ul>
+              <li>前回の相談内容に触れる</li>
+              <li>前回伝えた流れや時期を踏まえる</li>
+              <li>今相談する理由を伝える</li>
+              <li>前回から実際に行動したことを伺う</li>
+            </ul>
+          </div>
+          <button class="advice-button" type="button" data-modal="modal-follow">改善やアドバイスを見る ⇒</button>
+        </article>
+
+        <div class="summary"><strong>今回の要点</strong><span>追いメッセージは営業ではなく、「その後を気に掛けている」と伝えるアフターフォローとして設計すると自然です。</span></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="modal-hearing" role="dialog" aria-modal="true" aria-labelledby="title-hearing">
+    <div class="modal">
+      <button class="close" type="button" aria-label="閉じる">×</button>
+      <h2 id="title-hearing">初回ヒアリングの改善例</h2>
+      <p>初回ヒアリングは、情報を増やすだけでなく、お客様に「この先生は私の事情を理解しようとしてくれている」と感じてもらうための工程です。</p>
+      <h3>確認したいポイント</h3>
+      <ol>
+        <li>現在の状況</li>
+        <li>別れた経緯</li>
+        <li>最も知りたいことは何か</li>
+      </ol>
+      <p class="note">この3点を必ずすべて聞くという意味ではありません。状況に合った質問を一つでも加えることで、鑑定結果への信憑性や期待感が高まり、「自分のことを理解してくれている」というつながりを感じてもらいやすくなります。</p>
+      <div class="example">
+        <strong>送信例</strong>
+        <span class="example-title">復縁鑑定（音信不通）のケース</span>
+        ご相談いただきありがとうございます。カルテ①の○○様との復縁についてですね。<br>
+        とても大切なご縁だからこそ、できる限りお力になれるよう、丁寧に視させていただきます🌿<br><br>
+        より今の状況に合った鑑定を行うために、差し支えなければ少しだけ教えてください。<br>
+        最後に連絡を取ったのはいつ頃でしょうか？ また、現在ブロックなどはされていますか？
+      </div>
+      <p>質問は一度に増やしすぎず、鑑定結果を左右する重要な点から確認するのがおすすめです。</p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-reading" role="dialog" aria-modal="true" aria-labelledby="title-reading">
+    <div class="modal">
+      <button class="close" type="button" aria-label="閉じる">×</button>
+      <h2 id="title-reading">共感を加えた鑑定の進め方</h2>
+      <p>具体的な情報提示は強みです。その前後に、お客様の心情を受け止める短い言葉を加えることで、鑑定全体の温度が上がります。</p>
+      <h3>意識したい流れ</h3>
+      <ul>
+        <li>お客様の状況や感情を受け止める</li>
+        <li>なぜ今それを確認するのかを伝える</li>
+        <li>その先に分かる具体的な情報を提示する</li>
+      </ul>
+      <div class="example">
+        <strong>送信例</strong><br><br>
+        復縁を望んでいても、連絡することで逆に距離ができないか不安になりますよね。ここまで慎重になっているのは、それだけ○○様とのご縁を大切に考えているからだと思います。<br><br>
+        今のお二人の流れを踏まえて、連絡を送りやすい時間帯や文章例、避けた方がよい言葉まで具体的に視ていくこともできます。続けて確認してみましょうか？
+      </div>
+      <p>共感の言葉は長くする必要はありません。お客様の状況に合った一文があるだけでも印象は大きく変わります。</p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modal-follow" role="dialog" aria-modal="true" aria-labelledby="title-follow">
+    <div class="modal">
+      <button class="close" type="button" aria-label="閉じる">×</button>
+      <h2 id="title-follow">アフターフォローの改善例</h2>
+      <p>数日後の追いメッセージでは、前回の内容と今のタイミングを結びつけることで、自然に再相談のきっかけを作れます。</p>
+      <h3>入れたい要素</h3>
+      <ul>
+        <li>前回の相談を覚えていることが伝わる一文</li>
+        <li>前回お伝えした時期や流れへの言及</li>
+        <li>その後の変化や行動を確認する質問</li>
+        <li>今確認することで得られること</li>
+      </ul>
+      <div class="example">
+        <strong>送信例</strong><br><br>
+        先日は○○様との復縁についてご相談いただき、ありがとうございました。その後、お相手様へ連絡を送る機会や、何か小さな変化はありましたか？<br><br>
+        前回お伝えした流れでは、ここからの行動によって距離感が変わりやすい時期に入っていきます。まだ動かれていない場合も、今のお気持ちや状況に合わせて進め方を一緒に整理できますので、気になることがあればお聞かせくださいね。
+      </div>
+      <p>単なる再依頼の案内ではなく、「前回の続きを一緒に考える」という形にすると、寄り添いが伝わりやすくなります。</p>
+    </div>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    const adviceButtons = document.querySelectorAll('.advice-button');
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(item => item.classList.remove('active'));
+        panels.forEach(panel => panel.classList.remove('active'));
+        tab.classList.add('active');
+        const target = document.getElementById(tab.dataset.panel);
+        if (target) target.classList.add('active');
+      });
+    });
+
+    adviceButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const target = document.getElementById(button.dataset.modal);
+        if (target) target.classList.add('open');
+      });
+    });
+
+    backdrops.forEach(backdrop => {
+      const closeButton = backdrop.querySelector('.close');
+      if (closeButton) {
+        closeButton.addEventListener('click', () => backdrop.classList.remove('open'));
+      }
+      backdrop.addEventListener('click', event => {
+        if (event.target === backdrop) backdrop.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        backdrops.forEach(backdrop => backdrop.classList.remove('open'));
+      }
+    });
+  </script>
+</body>
+</html>
